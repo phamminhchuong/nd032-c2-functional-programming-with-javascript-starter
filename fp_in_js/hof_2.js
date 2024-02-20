@@ -7,7 +7,15 @@ weaponsWithNoises = [
 ]
 
 function weaponsFromUniverse(universe) {
-	// ...Your code here!
+	let uniWeapon = weaponsWithNoises.filter(x => x.universe === universe);
+	return function (nameWeapon){
+		let weapon = uniWeapon.filter(x => x.name === nameWeapon);
+		if(weapon[0]){
+			console.log(`used ${nameWeapon}: ${weapon[0].noise}`)
+		}else{
+			console.log('Noisy Cricket is not a part of the Star Wars universe');
+		}
+	}
 }
 
 // USAGE

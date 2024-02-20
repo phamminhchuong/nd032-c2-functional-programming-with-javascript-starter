@@ -1,3 +1,5 @@
+
+
 // import immutablejs.js
 const Immutable = require('immutable');
 
@@ -29,6 +31,8 @@ const map2 = Immutable.Map({
 
 // YOUR TURN --------------------------------------------------------------
 // create `map3` immutable object by merging `map1` and `map2`
+
+map3 = map1.merge(map2)
 
 console.log(map1.toJS())
 console.log(map2.toJS())

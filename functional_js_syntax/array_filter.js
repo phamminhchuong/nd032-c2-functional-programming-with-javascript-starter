@@ -1,5 +1,5 @@
 // 1. Find all the words with more than 7 characters
-const words = ['tardis', 'grok', 'frak', 'blaster', 'klingon', 'shepherd']
+//const words = ['tardis', 'grok', 'frak', 'blaster', 'klingon', 'shepherd']
 
 // expected output: Array ['shepherd']
 

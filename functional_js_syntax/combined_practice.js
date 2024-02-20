@@ -114,6 +114,20 @@ const characters = [
 
 // Your Code here
 
+const groupedCharacters = characters
+    .reduce((acc, curr, i, arr) => {
+        acc[curr.universe] = acc[curr.universe] === undefined ? [] : acc[curr.universe]
+        acc[curr.universe].push(curr)
+
+        if (i + 1 == arr.length) {
+            return Object.values(acc)
+        }
+
+        return acc
+ }, {})
+
+ console.log(groupedCharacters)
+
 // expected output:
 
 // [ 

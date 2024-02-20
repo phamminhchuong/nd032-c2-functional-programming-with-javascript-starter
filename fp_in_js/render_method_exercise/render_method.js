@@ -33,3 +33,20 @@ render(root)
 {/* <nav>Menu</nav> */ }
 
 // Your Code Here
+
+function Menu(show){
+    return show ? `
+    <nav>
+        <ul>
+            <li>About Us</li>
+            <li>Contact Us</li>
+            <li>Login</li>
+        </ul>
+    </nav>
+    ` : `
+    <nav>Menu</nav>
+    `
+}
+
+console.log(Menu(true))
+console.log(Menu(false))

@@ -16,6 +16,12 @@ var index = [
     {key: 3, sector: 8346, t_score: 10, id: 'n9837ks857', value: 'Jawa'},
 ]
 
+var newArray = index.map(function (item) { 
+    return {id: item.id.slice(0,3), value: item.value}
+ })
+
+console.log(newArray)
+
 // Expected Output:
 // [
 //     {id: '123', value: 'Klingon'},

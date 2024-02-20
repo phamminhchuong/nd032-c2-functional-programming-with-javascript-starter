@@ -5,13 +5,21 @@ var nearEarthObjects = require('./nasa_near_earth_object_API.json');
 
 // Total Count ---------------------------------------------
 // 1. How many near-earth objects did NASA register for the date of the search? Return the asteroid count.
-
+console.log(nearEarthObjects.element_count)
 
 // Averages ------------------------------------------------
 // 2. What was the average absolute magnitude of all the near earth objects in this data set? Return the average absolute_magnitude_h.
 
 // Hint - you can achieve this multiple ways, but the reduce method can be a little-known but cool way to find averages. To do it though, you'll need to use the initial_value argument
 // For some extra challenge try using reduce with the initial setting argument. To learn more about it, take a look at this page: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
+let listObj = Object.values(nearEarthObjects.near_earth_objects).flat()
+let average = listObj.reduce((acc, cur, i, arr) => {
+    if(i + 1 == arr.length){
+        return acc / arr.length
+    }
+    return acc += cur.absolute_magnitude_h;
+}, 0)
+console.log(average)
 
 
 // Hazardous -----------------------------------------------
