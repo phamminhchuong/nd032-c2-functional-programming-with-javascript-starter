@@ -16,7 +16,6 @@ const root = document.getElementById('root')
 
 const updateStore = (store, newState) => {
     store = store.merge(newState)
-    //console.log(store.get('roverSelected'))
     render(root, store)
 }
 
@@ -28,9 +27,35 @@ const changeRover = function(rover){
     updateStore(store, {apod:'', roverSelected:rover})
 }
 
+const initHTMLButton = function (text){
+    return function(){
+        return `<button class="button-rover" onclick="changeRover('${text}')">${text}</button>`
+    }
+}
+
+const initHTMLImageContent = function(data){
+    return function (){
+        return (`
+                <div class="content">
+                    <div class="img-content>">
+                        <img src="${data.img_src}"/>
+                    </div>
+                    <div class="des-content">
+                        <p>Landing date: ${data.rover.landing_date}</p>
+                        <p>Launch date: ${data.rover.launch_date}</p>
+                        <p>Status: ${data.rover.status}</p>
+                        <p>Total photos: ${data.rover.total_photos}</p>
+                        <p>Max date: ${data.rover.max_date}</p>
+                    </div>
+                </div>
+                    `)
+    }
+}
+
 // create content
 const App = (state) => {
     let rovers = state.get('rovers')
+    
     return `
         <header></header>
         <main>
@@ -39,9 +64,8 @@ const App = (state) => {
                 <h2>Please select a rover to see amazing picture from Mars:</h2>
                 <div class="select-rover">
                 ${rovers.map(function(rover){
-                    return `
-                        <button class="button-rover" onclick="changeRover('${rover}')">${rover}</button>
-                    `
+                    let renderButton = initHTMLButton(rover)
+                    return renderButton()
                 }).join(``)}
             </div>
             </div>
@@ -88,20 +112,9 @@ const ImageOfTheDay = (state) => {
         let randomIndex = Math.floor(Math.random() * photos.length);
         data = photos[randomIndex]
     }
-    return (`
-    <div class="content">
-        <div class="img-content>">
-            <img src="${data.img_src}"/>
-        </div>
-        <div class="des-content">
-            <p>Landing date: ${data.rover.landing_date}</p>
-            <p>Launch date: ${data.rover.launch_date}</p>
-            <p>Status: ${data.rover.status}</p>
-            <p>Total photos: ${data.rover.total_photos}</p>
-            <p>Max date: ${data.rover.max_date}</p>
-        </div>
-    </div>
-        `)
+
+    let renderContent = initHTMLImageContent(data)
+    return renderContent()
 }
 
 // ------------------------------------------------------  API CALLS
