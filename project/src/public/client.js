@@ -1,14 +1,22 @@
-let store = {
-    user: { name: "Student" },
+
+let store = Immutable.Map({
+    user: Immutable.Map({ name: "Visitor" }),
+    dateQuery: Immutable.Map({
+        'Curiosity': '2024-02-19',
+        'Opportunity': '2018-06-11', 
+        'Spirit' : '2010-03-21'
+    }),
+    roverSelected: '',
     apod: '',
-    rovers: ['Curiosity', 'Opportunity', 'Spirit'],
-}
+    rovers: Immutable.List(['Curiosity', 'Opportunity', 'Spirit']),
+})
 
 // add our markup to the page
 const root = document.getElementById('root')
 
 const updateStore = (store, newState) => {
-    store = Object.assign(store, newState)
+    store = store.merge(newState)
+    //console.log(store.get('roverSelected'))
     render(root, store)
 }
 
@@ -16,28 +24,34 @@ const render = async (root, state) => {
     root.innerHTML = App(state)
 }
 
+const changeRover = function(rover){
+    updateStore(store, {apod:'', roverSelected:rover})
+}
 
 // create content
 const App = (state) => {
-    let { rovers, apod } = state
-
+    let rovers = state.get('rovers')
     return `
         <header></header>
         <main>
-            ${Greeting(store.user.name)}
+            ${Greeting(state.get('user').get('name'))}  
+            <div class="container-button">
+                <h2>Please select a rover to see amazing picture from Mars:</h2>
+                <div class="select-rover">
+                ${rovers.map(function(rover){
+                    return `
+                        <button class="button-rover" onclick="changeRover('${rover}')">${rover}</button>
+                    `
+                }).join(``)}
+            </div>
+            </div>
+            ${state.get('roverSelected') ? `
             <section>
-                <h3>Put things on the page!</h3>
-                <p>Here is an example section.</p>
-                <p>
-                    One of the most popular websites at NASA is the Astronomy Picture of the Day. In fact, this website is one of
-                    the most popular websites across all federal agencies. It has the popular appeal of a Justin Bieber video.
-                    This endpoint structures the APOD imagery and associated metadata so that it can be repurposed for other
-                    applications. In addition, if the concept_tags parameter is set to True, then keywords derived from the image
-                    explanation are returned. These keywords could be used as auto-generated hashtags for twitter or instagram feeds;
-                    but generally help with discoverability of relevant imagery.
-                </p>
-                ${ImageOfTheDay(apod)}
+                ${ImageOfTheDay(state)}
             </section>
+            `:
+            ``}
+            
         </main>
         <footer></footer>
     `
@@ -48,58 +62,54 @@ window.addEventListener('load', () => {
     render(root, store)
 })
 
-// ------------------------------------------------------  COMPONENTS
-
-// Pure function that renders conditional information -- THIS IS JUST AN EXAMPLE, you can delete it.
 const Greeting = (name) => {
     if (name) {
         return `
             <h1>Welcome, ${name}!</h1>
         `
     }
-
     return `
         <h1>Hello!</h1>
     `
 }
 
-// Example of a pure function that renders infomation requested from the backend
-const ImageOfTheDay = (apod) => {
 
-    // If image does not already exist, or it is not from today -- request it again
-    const today = new Date()
-    const photodate = new Date(apod.date)
-    console.log(photodate.getDate(), today.getDate());
-
-    console.log(photodate.getDate() === today.getDate());
-    if (!apod || apod.date === today.getDate() ) {
-        getImageOfTheDay(store)
+const ImageOfTheDay = (state) => {
+    let apod = state.get('apod')
+    if (!apod) {
+        getImageOfTheDay(state)
     }
-
-    // check if the photo of the day is actually type video!
-    if (apod.media_type === "video") {
-        return (`
-            <p>See today's featured video <a href="${apod.url}">here</a></p>
-            <p>${apod.title}</p>
-            <p>${apod.explanation}</p>
-        `)
-    } else {
-        return (`
-            <img src="${apod.image.url}" height="350px" width="100%" />
-            <p>${apod.image.explanation}</p>
-        `)
+    if(apod == ''){
+        return '<p style=\'color:white\'>Updating...</p>';
     }
+    let data;
+    const photos = apod.get('photos').toJS()
+    if(photos != undefined && photos.length > 0){
+        let randomIndex = Math.floor(Math.random() * photos.length);
+        data = photos[randomIndex]
+    }
+    return (`
+    <div class="content">
+        <div class="img-content>">
+            <img src="${data.img_src}"/>
+        </div>
+        <div class="des-content">
+            <p>Landing date: ${data.rover.landing_date}</p>
+            <p>Launch date: ${data.rover.launch_date}</p>
+            <p>Status: ${data.rover.status}</p>
+            <p>Total photos: ${data.rover.total_photos}</p>
+            <p>Max date: ${data.rover.max_date}</p>
+        </div>
+    </div>
+        `)
 }
 
 // ------------------------------------------------------  API CALLS
 
-// Example API call
 const getImageOfTheDay = (state) => {
-    let { apod } = state
-
-    fetch(`http://localhost:3000/apod`)
+    let dateQuery= state.get('dateQuery');
+    let roverSelected = state.get('roverSelected');
+    fetch(`http://localhost:3000/apod?rover=${roverSelected.toLowerCase()}&date=${dateQuery.get(roverSelected)}`)
         .then(res => res.json())
-        .then(apod => updateStore(store, { apod }))
-
-    return data
+        .then(apod => {updateStore(state, { apod });})
 }
